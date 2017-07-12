@@ -1,0 +1,23 @@
+<template>
+    <require from="errors.html"></require>
+    <div class="container" style="width:500px">
+        <form class="form-signin" submit.delegate="login()">
+            <h2 class="form-signin-heading">AURORA Portal Login</h2>
+            <label for="inputEmail" class="sr-only">Email address</label>
+            <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus
+                   value.bind="email">
+            <label for="inputPassword" class="sr-only">Password</label>
+            <input type="password" id="inputPassword" class="form-control" placeholder="Password" required
+                   value.bind="password">
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            <div class="spacer"></div>
+            <div class="message">
+                Don't have an account yet? Sign up <a href="#" click.trigger="signup()">here</a>
+            </div>
+            <div class="message">
+                Forgot password? Click <a href="#" click.trigger="forgotPassword()">here</a>
+            </div>
+        </form>
+        <errors danger.bind="danger" errors.bind="errors" warning.bind="warning" success.bind="success"></errors>
+    </div>
+</template>

@@ -1,0 +1,98 @@
+<template>
+  <!--<require from="aurelia-kendoui-bridge/window/window"></require>-->
+
+  <require from="./errors.html"></require>
+  <section id="wrapper">
+
+    <div id="map">
+
+      <a href="#menu-toggle" class="btn btn-default filters" id="menu-toggle" click.delegate="toggleMenu()"
+         show.bind="!menuDisplayed">&#9776;&nbsp;Filters</a>
+
+      <div id="popup"></div>
+
+      <div id="sidebar-wrapper">
+        <h3>Filters</h3>
+        <ul class="sidebar-nav">
+          <li class="sidebar-brand">
+            <a href="javascript:void(0)" class="closebtn" click.delegate="toggleMenu()">&times; Hide</a>
+          </li>
+          <li>
+            <form role="form" style="margin-bottom: 100px">
+
+              <div class="form-group">
+                <label for="dataset">Data-set</label>
+                <select value.bind="selectedDataset" id="dataset" class="form-control"
+                        change.delegate="selectDataset()">
+                  <option repeat.for="set of datasets" model.bind="set">${set.Title}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="datepick">Date/Time</label>
+                <input id="datepick"
+                       ej-date-time-picker="e-value.bind:dateValue;e-min-date-time.bind:minDate;e-max-date-time.bind:maxDate;e-interval.bind:interval;e-width.bind:'100%';e-date-time-format.bind:'dd/MM/yyyy HH:mm';e-time-display-format.bind:'HH:mm'"
+                       e-on-change.trigger="changeTime($event)" e-on-close.trigger="onClose($event)"/>
+              </div>
+              <div class="form-group">
+                <label>Layers</label>
+                <div repeat.for="layer of layers" class="checkbox" style="margin-bottom:20px">
+                  <label style="margin-bottom: 5px">
+                    <input type="checkbox" model.bind="layer"
+                           checked.bind="$parent.selectedLayers" change.delegate="toggleLayer(layer)">${layer.Abstract}
+                    (${layer.Name})
+                  </label>
+                  <!--
+                                  <input id="date_${$index}" ej-date-time-picker="e-width.bind:'80%'"/>
+                  -->
+
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="btn-group">
+                  <button id="btnOpen" type="button" class="btn btn-success"
+                          click.delegate="showDialog()">Show Map
+                  </button>
+                  <a id="export-png" class="btn btn-success" target="_blank"><i
+                    class="fa fa-download" aria-hidden="true"></i>&nbsp;Download Map</a>
+                </div>
+
+              </div>
+
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!--<div id="page-content-wrapper">-->
+    <!--<div class="container-fluid">-->
+
+    <!--<div class="row">-->
+
+    <!--
+              <div class="col-md-12" id="control" style="min-height: 700px;">
+                <a href="#menu-toggle" class="btn btn-default filters" id="menu-toggle" click.delegate="toggleMenu()"
+                   show.bind="!menuDisplayed">&#9776;
+                  Filters</a>
+                <ej-dialog id="basicDialog" e-title="Pydap WMS Sample" e-width="800" e-min-width="310" e-min-height="500"
+                           e-action-buttons.bind="actionButtons"
+                           e-containment=".col-md-12"
+                           e-position.bind="dialogPosition"
+                           e-on-close.trigger="onDialogClose()">
+
+                </ej-dialog>
+
+              </div>
+
+              <div id="window"
+                   ak-window="k-width: 600px; k-title: About Alvar Aalto; k-visible.bind: true;"
+                   k-on-close.delegate="onClose()">
+
+              </div>
+    -->
+
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+  </section>
+</template>

@@ -1,0 +1,56 @@
+<template>
+  <require from="blur-image"></require>
+
+  <section class="au-animate">
+    <h2>${heading}</h2>
+    <div class="btn-toolbar" role="toolbar">
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary"
+                click.delegate="addUser()">Add User</button>
+      </div>
+    </div>
+    <div class="row au-stagger">
+      <table class="table table-striped"
+             aurelia-table="data.bind: users; display-data.bind: $displayData;
+             current-page.bind: currentPage; page-size.bind: pageSize; total-items.bind: totalItems;">
+        <thead>
+        <tr>
+          <th aut-sort="key: firstname">First Name</th>
+          <th aut-sort="key: lastname">Last name</th>
+          <th aut-sort="key: email">E-mail</th>
+          <th aut-sort="key: role">Role</th>
+          <th aut-sort="key: createDate">Created</th>
+          <th aut-sort="key: updateDate; default:desc">Updated</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr repeat.for="user of $displayData" aut-select="row.bind: user; mode: single; selected-class: info"
+            select.delegate="rowSelected($event)">
+          <td>${user.firstname}</td>
+          <td>${user.lastname}</td>
+          <td><a href="mailto:${user.email}">${user.email}</a></td>
+          <td>${user.role}</td>
+          <td>${user.createDate}</td>
+          <td>${user.updateDate}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="row">
+      <div class="col-md-9">
+        <aut-pagination current-page.bind="currentPage" page-size.bind="pageSize" total-items.bind="totalItems"
+                        pagination-size.bind="5" boundary-links.bind="true"></aut-pagination>
+      </div>
+      <div class="col-md-3">
+        <div class="form-inline">
+          <div class="form-group pull-right">
+            <label for="pageSize">Page Size: </label>
+            <select value.bind="pageSize" id="pageSize" class="form-control">
+              <option repeat.for="size of pageSizes" model.bind="size">${size}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>

@@ -1,0 +1,14 @@
+<template bindable="danger,errors,warning,success">
+    <div class="alert alert-danger" hidden.bind="danger==null">
+        <strong>Error!</strong> ${danger}
+    </div>
+    <ul class="list-group" hidden.bind="errors==null">
+        <li class="list-group-item list-group-item-danger" repeat.for="error of errors">${error}</li>
+    </ul>
+    <div class="alert alert-warning" hidden.bind="warning==null">
+        <strong>Warning!</strong> ${warning}
+    </div>
+    <div class="alert alert-success" hidden.bind="success==null">
+        <strong>Success!</strong> ${success}
+    </div>
+</template>

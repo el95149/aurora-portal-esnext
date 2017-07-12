@@ -1,0 +1,10 @@
+<template>
+    <ux-dialog>
+        <ux-dialog-header>${question}</ux-dialog-header>
+
+        <ux-dialog-footer>
+            <button click.trigger="controller.ok()">Yes</button>
+            <button click.trigger="controller.cancel()">No</button>
+        </ux-dialog-footer>
+    </ux-dialog>
+</template>

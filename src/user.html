@@ -1,0 +1,106 @@
+<template>
+  <require from="./errors.html"></require>
+  <ux-dialog>
+    <ux-dialog-header>
+      <h3>Add/Edit User</h3>
+    </ux-dialog-header>
+    <ux-dialog-body>
+      <errors danger.bind="danger" errors.bind="errors" warning.bind="warning" success.bind="success"></errors>
+      <form role="form" validate.bind="validation">
+        <div class="row">
+          <div class="form-group col-md-6">
+            <label for="firstname">First Name</label>
+            <input value.bind="user.firstname" class="form-control" id="firstname"
+                   placeholder="First name" required/>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="lastname">Last Name</label>
+            <input value.bind="user.lastname" class="form-control" id="lastname"
+                   placeholder="Last name" required/>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label for="email">Email</label>
+            <input type="email" value.bind="user.email" class="form-control" id="email"
+                   placeholder="Email" required/>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label for="password">Password</label>
+            <input type="password" id="password" class="form-control"
+                   placeholder="Fill in the user password" required
+                   value.bind="user.password">
+          </div>
+        </div>
+        <!--
+                <div class="row">
+                  <div class="form-group col-md-6">
+                    <label for="userBirthday">Birthday</label>
+                    <div style="position: relative">
+                      <input datepicker type="text" class="form-control" value.bind="user.userBirthday"
+                             id="userBirthday"/>
+                    </div>
+                  </div>
+                </div>
+        -->
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label for="gender">Gender</label>
+            <select value.bind="user.gender" class="form-control" id="gender">
+              <option repeat.for="gender of genders" model.bind="gender.value">${gender.name}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group col-md-6">
+            <label for="role">Role</label>
+            <select value.bind="user.role" class="form-control" id="role">
+              <option repeat.for="role of roles" model.bind="role">${role}
+              </option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="isActive">Active</label>
+            <select value.bind="user.isActive" class="form-control" id="isActive">
+              <option model.bind="true">True</option>
+              <option model.bind="false">False</option>
+            </select>
+          </div>
+        </div>
+        <!--
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <select value.bind="user.country.countryId" class="form-control" id="country">
+                                <option repeat.for="country of countries" model.bind="country.countryId">${country.countryName}
+                                </option>
+                            </select>
+                        </div>
+        -->
+        <div class="form-group">
+          <label for="organization">Organization</label>
+          <input value.bind="user.organization" class="form-control" id="organization"
+                 placeholder="Organization the user belongs to (if any)"/>
+        </div>
+        <!--
+                        <div class="form-group">
+                            <label for="occupation">Occupation</label>
+                            <input value.bind="user.occupation" class="form-control" id="occupation"
+                                   placeholder="User profession (if any)"/>
+                        </div>
+        -->
+      </form>
+    </ux-dialog-body>
+
+    <ux-dialog-footer>
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary" click.delegate="save()">Save</button>
+        <button type="button" class="btn btn-danger" click.delegate="delete()">Delete</button>
+        <button type="button" class="btn btn-default" click.delegate="controller.cancel()">Cancel</button>
+      </div>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>
