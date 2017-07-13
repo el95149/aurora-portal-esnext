@@ -11,9 +11,9 @@ export class ApplicationState {
 
   // private _ncWMSUrl = "http://10.0.0.146:8080/ncWMS2/";
 
-  _ncWMSUrl = 'http://www.ilabsse.gr:8080/ncWMS2/';
+  // _ncWMSUrl = 'http://www.ilabsse.gr:8080/ncWMS2/';
 
-  // private _ncWMSUrl = "http://localhost:8080/ncWMS2/";
+  _ncWMSUrl = 'http://localhost:8080/ncWMS2/';
 
   static _notSpecified = '(--Not Specified--)';
 
