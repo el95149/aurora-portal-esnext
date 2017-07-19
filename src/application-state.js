@@ -1,6 +1,9 @@
 /**
  * Created by aanagnostopoulos on 10/7/2017.
  */
+
+import {Base64} from 'base64';
+
 export class ApplicationState {
 
   // private _apiBaseUrl = "http://10.0.0.146:8080/aurora/api/";
