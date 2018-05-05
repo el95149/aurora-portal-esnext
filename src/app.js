@@ -9,10 +9,10 @@ export class App {
 
     config.addPipelineStep('authorize', AuthorizeStep);
     config.map([
-      {route: ['', 'login'], name: 'login', moduleId: 'login', nav: false, title: 'Login'},
-      {route: 'logout', name: 'logout', moduleId: 'logout', nav: false, title: 'Logout'},
-      {route: 'users', name: 'users', moduleId: 'users', nav: true, title: 'Users', settings:{auth: true, isAdmin: true}},
-      {route: 'pydap', name: 'pydap', moduleId: 'pydap', nav: true, title: 'Pydap WMS', settings:{auth: true}}
+      // {route: ['', 'login'], name: 'login', moduleId: 'login', nav: false, title: 'Login'},
+      // {route: 'logout', name: 'logout', moduleId: 'logout', nav: false, title: 'Logo@ut'},
+      // {route: 'users', name: 'users', moduleId: 'users', nav: true, title: 'Users', settings:{auth: true, isAdmin: true}},
+      {route: ['', 'pydap'], name: 'pydap', moduleId: 'pydap', nav: true, title: 'Pydap WMS', settings: {auth: false}}
       // { route: ['', 'welcome'], name: 'welcome',      moduleId: 'welcome',      nav: true, title: 'Welcome' },
       // { route: 'child-router',  name: 'child-router', moduleId: 'child-router', nav: true, title: 'Child Router' }
     ]);
