@@ -55,9 +55,16 @@
                   <a id="export-png" class="btn btn-success" target="_blank"><i
                     class="fa fa-download" aria-hidden="true"></i>&nbsp;Download Map</a>
                 </div>
-
               </div>
-
+              <div class="form-group">
+                <div class="btn-group">
+                  <button id="btnRaw" class="btn btn-primary" click.delegate="downloadRaw()" disabled.bind="!datasetSupportsRaw"><i
+                    class="fa fa-download" aria-hidden="true"></i>&nbsp;Download Raw Data</button>
+                </div>
+              </div>
+              <div class="alert alert-warning" role="alert" if.bind="!datasetSupportsRaw">
+                RAW data not supported for Data-set
+              </div>
             </form>
           </li>
         </ul>

@@ -11,6 +11,8 @@ import {TaskQueue} from 'aurelia-framework';
 import 'jquery';
 import moment from 'moment';
 import {saveAs} from 'file-saver';
+import {computedFrom} from 'aurelia-framework';
+
 // import Control = ol.control.Control;
 
 
@@ -114,28 +116,28 @@ export class Pydap extends BaseVM {
     'x-Rainbow',
     'x-Rainbow-inv',
     'x-Sst',
-    'x-Sst-inv'];
-  actionButtons = ['close', 'collapsible', 'maximize', 'minimize', 'pin'];
-  dialogPosition = {X: 100, Y: 10};
-  dateValue;
-  minDate;
-  maxDate;
-  interval;
-  map = null;
-  fields;
-  filterType;
-  dataManager;
-  query;
-  vectorLayer = null;
-  popupElement = null;
-  popupOverlay = null;
-  startLonLat = Messages.COORDINATES_EUROPE_CENTER;
-  baseLayer;
-  datasets = [];
-  selectedDataset = null;
-  layers = [];
-  selectedLayers = [];
-  menuDisplayed = true;
+    'x-Sst-inv']
+  actionButtons = ['close', 'collapsible', 'maximize', 'minimize', 'pin']
+  dialogPosition = {X: 100, Y: 10}
+  dateValue
+  minDate
+  maxDate
+  interval
+  map = null
+  fields
+  filterType
+  dataManager
+  query
+  vectorLayer = null
+  popupElement = null
+  popupOverlay = null
+  startLonLat = Messages.COORDINATES_EUROPE_CENTER
+  baseLayer
+  datasets = []
+  selectedDataset = null
+  layers = []
+  selectedLayers = []
+  menuDisplayed = true
 
   constructor(http, state, taskQueue) {
     super();
@@ -356,5 +358,15 @@ export class Pydap extends BaseVM {
       let mapLayer = mapLayers[a];
       mapLayer.getSource().updateParams({'TIME': moment2.toISOString()});
     }
+  }
+
+  @computedFrom('selectedDataset')
+  get datasetSupportsRaw() {
+    console.log(this.selectDataset !== null && this.selectedDataset.Title.startsWith('http://'));
+    return this.selectDataset !== null && this.selectedDataset.Title.startsWith('http://');
+  }
+
+  downloadRaw() {
+    window.open(this.selectedDataset.Title + '.ascii?');
   }
 }
