@@ -185,7 +185,8 @@ export class Pydap extends BaseVM {
     this.baseLayer = new layer.Tile({
       // opacity: 0.5,
       source: new source.XYZ({
-        url: 'https://{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png'
+        url: 'https://{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
+        wrapX: false
       })
     });
     // this.baseLayer = new layer.Tile({
