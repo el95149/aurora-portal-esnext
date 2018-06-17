@@ -1,7 +1,7 @@
 /**
  * Created by aanagnostopoulos on 11/7/2017.
  */
-import {layer, Map, Overlay, source, View, proj, format, Attribution, control} from 'openlayers';
+import {layer, Map, Overlay, source, View, proj, format, Attribution, control, interaction} from 'openlayers';
 import {inject} from 'aurelia-dependency-injection';
 import {Messages} from './messages';
 import {HttpClient} from 'aurelia-fetch-client';
@@ -138,6 +138,8 @@ export class Pydap extends BaseVM {
   layers = []
   selectedLayers = []
   menuDisplayed = true
+  source = null
+  boundingBoxPresent = false
 
   constructor(http, state, taskQueue) {
     super();
@@ -172,7 +174,10 @@ export class Pydap extends BaseVM {
 
   attached() {
     console.log('attached');
-    this.vectorLayer = new layer.Vector();
+    this.source = new source.Vector({wrapX: false});
+    this.vectorLayer = new layer.Vector({
+      source: this.source
+    });
     this.popupElement = document.getElementById('popup');
     this.popupOverlay = new Overlay({
       element: this.popupElement,
@@ -189,25 +194,13 @@ export class Pydap extends BaseVM {
         wrapX: false
       })
     });
-    // this.baseLayer = new layer.Tile({
-    //   opacity: 1,
-    //   source: new source.TileWMS({
-    //     projection: 'EPSG:4326',
-    //     url: 'http://demo.opengeo.org/geoserver/wms',
-    //     crossOrigin: 'anonymous',
-    //     params: {'LAYERS': 'nasa:bluemarble'}
-    //   })
-    // });
 
     this.map = new Map({
       controls: [],
       target: 'map',
       layers: [
-        this.baseLayer
-        //new ol.layer.Tile({
-        //	source: new ol.source.MapQuest({layer: 'sat'})
-        //}),
-        // this.vectorLayer
+        this.baseLayer,
+        this.vectorLayer
       ],
       //overlays: [this.popupOverlay],
       view: new View({
@@ -230,6 +223,42 @@ export class Pydap extends BaseVM {
       });
       this.map.renderSync();
     }, false);
+
+    // let dragBox = new interaction.DragBox({
+    //   condition: events.condition.platformModifierKeyOnly
+    // });
+    let _self = this;
+    // dragBox.on('boxend', function() {
+    //   // Your stuff when the box is already drawn
+    //   let extent = dragBox.getGeometry().getExtent();
+    //   console.log(extent);
+    //   _self.map.getView().fit(dragBox.getGeometry(), _self.map.getSize());
+    // });
+    // this.map.addInteraction(dragBox);
+
+    let draw = new interaction.Draw({
+      source: this.source,
+      type: 'Circle',
+      geometryFunction: interaction.Draw.createBox()
+    });
+    draw.on('drawend', function(e) {
+      // Your stuff when the box is already drawn
+      // clear any previously drawn boxes
+      _self.boundingBoxPresent = true;
+      _self.source.clear();
+      _self.selectedLayers.forEach(function(selectedLayer) {
+        _self.map.getLayers().forEach(mapLayer => {
+          let layerName = mapLayer.get('name');
+          if (selectedLayer.Name === layerName) {
+            mapLayer.setExtent(e.feature.getGeometry().getExtent());
+          }
+        });
+        // selectedLayer.setExtent(e.feature.getGeometry().getExtent());
+      });
+      _self.map.getView().fit(e.feature.getGeometry(), _self.map.getSize());
+    });
+
+    this.map.addInteraction(draw);
 
     $('#btnOpen').hide();
   }
@@ -278,7 +307,11 @@ export class Pydap extends BaseVM {
     this.layers = this.selectedDataset.Layer;
     this.map.getLayers().clear();
     this.map.addLayer(this.baseLayer);
+    this.map.addLayer(this.vectorLayer);
+    // clear any previously selected layers and/or drawn boxes
     this.selectedLayers = [];
+    this.source.clear();
+    this.boundingBoxPresent = false;
     this.updateTimeInfo();
   }
 
@@ -304,7 +337,14 @@ export class Pydap extends BaseVM {
         style = this.styles[0];
       }
 
+      let bbox = null;
+      if (this.source.getFeatures().length > 0) {
+        // console.log(this.source.getFeatures()[0].getGeometry().getExtent());
+        bbox = this.source.getFeatures()[0].getGeometry().getExtent();
+      }
+
       let wmsLayer = new layer.Tile({
+        extent: bbox !== null ? bbox : this.map.getView().calculateExtent(),
         opacity: 0.75,
         source: new source.TileWMS({
           attributions: [
@@ -313,7 +353,7 @@ export class Pydap extends BaseVM {
               'src="' + this.state.ncWMSUrl + 'wms?REQUEST=GetLegendGraphic&PALETTE=default&LAYERS=' + selectedLayer.Name + '&STYLES=default-scalar/' + style + '"/>'
             })
           ],
-          projection: 'EPSG:4326',
+          projection: 'EPSG:3857',
           url: this.state.ncWMSUrl + 'wms?SERVICE=wms',
           crossOrigin: 'anonymous',
           params: {
@@ -321,7 +361,6 @@ export class Pydap extends BaseVM {
             'TIME': moment(this.dateValue, 'DD/MM/YYYY HH:mm').toISOString(),
             'STYLES': 'default-scalar/' + style
           }
-          // params: {'LAYERS': selectedLayer.Name}
         })
       });
       wmsLayer.set('name', selectedLayer.Name);
@@ -369,7 +408,23 @@ export class Pydap extends BaseVM {
     return this.selectDataset !== null && this.selectedDataset.Title.startsWith('http://');
   }
 
+  @computedFrom('boundingBoxPresent', 'selectedLayers.length')
+  get isSelectionPresent() {
+    return this.selectedLayers.length > 0 ? true : this.boundingBoxPresent;
+  }
+
   downloadRaw() {
     window.open(this.selectedDataset.Title + '.ascii?');
+  }
+
+  clearBox() {
+    this.selectedLayers = [];
+    this.map.getLayers().clear();
+    this.map.addLayer(this.baseLayer);
+    this.map.addLayer(this.vectorLayer);
+    this.source.clear();
+    this.boundingBoxPresent = false;
+    this.map.getView().setCenter(proj.fromLonLat(this.startLonLat, 'EPSG:3857'));
+    this.map.getView().setZoom(Pydap.ZOOM_LEVEL_DEFAULT);
   }
 }

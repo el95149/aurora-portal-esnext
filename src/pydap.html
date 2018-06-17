@@ -33,6 +33,7 @@
                        ej-date-time-picker="e-value.bind:dateValue;e-min-date-time.bind:minDate;e-max-date-time.bind:maxDate;e-interval.bind:interval;e-width.bind:'100%';e-date-time-format.bind:'dd/MM/yyyy HH:mm';e-time-display-format.bind:'HH:mm'"
                        e-on-change.trigger="changeTime($event)" e-on-close.trigger="onClose($event)"/>
               </div>
+
               <div class="form-group">
                 <label>Layers</label>
                 <div repeat.for="layer of layers" class="checkbox" style="margin-bottom:20px">
@@ -45,6 +46,12 @@
                                   <input id="date_${$index}" ej-date-time-picker="e-width.bind:'80%'"/>
                   -->
 
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="btn-group">
+                  <button id="clearBox" class="btn btn-danger" click.delegate="clearBox()" disabled.bind="!isSelectionPresent"><i
+                    class="fa fa-remove" aria-hidden="true"></i>&nbsp;Clear Box-Layers</button>
                 </div>
               </div>
               <div class="form-group">
