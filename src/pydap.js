@@ -421,7 +421,7 @@ export class Pydap extends BaseVM {
 
   @computedFrom('selectedDataset')
   get datasetSupportsRaw() {
-    return this.selectDataset !== null && this.selectedDataset.Title.startsWith('http://');
+    return this.selectedDataset !== null && this.selectedDataset.Title.startsWith('http://');
   }
 
   @computedFrom('boundingBoxPresent', 'selectedLayers.length')
