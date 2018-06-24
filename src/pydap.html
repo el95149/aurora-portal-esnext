@@ -34,6 +34,21 @@
                        e-on-change.trigger="changeTime($event)" e-on-close.trigger="onClose($event)"/>
               </div>
 
+              <div class="alert alert-info" role="alert" if.bind="!isSelectionPresent">
+                <i class="fa fa-info-circle"></i>
+                To select an area: Left click on the start and end of the desired bounding box.
+              </div>
+
+              <div class="alert alert-success" role="alert" if.bind="isSelectionPresent && selectedLayers.length == 0">
+                <i class="fa fa-info-circle"></i>
+                Now select one more more layers, to actually display data!
+              </div>
+
+              <div class="alert alert-warning" role="alert" if.bind="isSelectionPresent && selectedLayers.length > 0">
+                <i class="fa fa-info-circle"></i>
+                To clear selected area,, click on the 'Clear Box-Layers' button below the available layers!
+              </div>
+
               <div class="form-group">
                 <label>Layers</label>
                 <div repeat.for="layer of layers" class="checkbox" style="margin-bottom:20px">
@@ -77,36 +92,5 @@
         </ul>
       </div>
     </div>
-
-    <!--<div id="page-content-wrapper">-->
-    <!--<div class="container-fluid">-->
-
-    <!--<div class="row">-->
-
-    <!--
-              <div class="col-md-12" id="control" style="min-height: 700px;">
-                <a href="#menu-toggle" class="btn btn-default filters" id="menu-toggle" click.delegate="toggleMenu()"
-                   show.bind="!menuDisplayed">&#9776;
-                  Filters</a>
-                <ej-dialog id="basicDialog" e-title="Pydap WMS Sample" e-width="800" e-min-width="310" e-min-height="500"
-                           e-action-buttons.bind="actionButtons"
-                           e-containment=".col-md-12"
-                           e-position.bind="dialogPosition"
-                           e-on-close.trigger="onDialogClose()">
-
-                </ej-dialog>
-
-              </div>
-
-              <div id="window"
-                   ak-window="k-width: 600px; k-title: About Alvar Aalto; k-visible.bind: true;"
-                   k-on-close.delegate="onClose()">
-
-              </div>
-    -->
-
-    <!--</div>-->
-    <!--</div>-->
-    <!--</div>-->
   </section>
 </template>
