@@ -159,6 +159,7 @@ export class Pydap extends BaseVM {
         let result = parser.read(text);
         // console.log(JSON.stringify(result, null, 2));
         this.datasets = result.Capability.Layer.Layer;
+        console.log(this.datasets);
         this.selectedDataset = this.datasets ? this.datasets[0] : null;
         this.layers = this.selectedDataset ? this.selectedDataset.Layer : undefined;
         //get time info
@@ -242,12 +243,12 @@ export class Pydap extends BaseVM {
       type: 'Circle',
       geometryFunction: interaction.Draw.createBox()
     });
-    draw.on('drawend', function(e) {
+    draw.on('drawend', function (e) {
       // Your stuff when the box is already drawn
       // clear any previously drawn boxes
       _self.boundingBoxPresent = true;
       _self.source.clear();
-      _self.selectedLayers.forEach(function(selectedLayer) {
+      _self.selectedLayers.forEach(function (selectedLayer) {
         _self.map.getLayers().forEach(mapLayer => {
           let layerName = mapLayer.get('name');
           if (selectedLayer.Name === layerName) {
@@ -268,7 +269,7 @@ export class Pydap extends BaseVM {
     console.log('click');
     let exportPNGElement = document.getElementById('export-png');
     // var canvas:any = document.getElementsByTagName('canvas')[0];
-    this.map.once('postcompose', function(event) {
+    this.map.once('postcompose', function (event) {
       let canvas = event.context.canvas;
       exportPNGElement.href = canvas.toDataURL('image/png');
       // console.log(canvas.toDataURL('image/png'));
@@ -331,6 +332,7 @@ export class Pydap extends BaseVM {
         this.map.removeLayer(layerToRemove);
       }
     } else {
+      console.log('show layer');
       // let style = this.styles[Math.floor(Math.random() * this.styles.length)];
       //choose a pallete style, based on the selected layer index
       let style = this.styles[this.layers.indexOf(selectedLayer)];
@@ -344,28 +346,42 @@ export class Pydap extends BaseVM {
         bbox = this.source.getFeatures()[0].getGeometry().getExtent();
       }
 
-      let wmsLayer = new layer.Tile({
-        extent: bbox !== null ? bbox : this.map.getView().calculateExtent(),
-        opacity: 0.75,
-        source: new source.TileWMS({
-          attributions: [
-            new Attribution({
-              html: '<img class="ol-attribution-large" ' +
-              'src="' + this.state.ncWMSUrl + 'wms?REQUEST=GetLegendGraphic&PALETTE=default&LAYERS=' + selectedLayer.Name + '&STYLES=default-scalar/' + style + '"/>'
+      fetch(this.state.ncWMSUrl + 'wms?SERVICE=WMS&REQUEST=GetMetadata&VERSION=1.3.0&ITEM=layerDetails' +
+        '&LAYERNAME=' + selectedLayer.Name)
+        .then(response => response.json())
+        .then(layerMetadata => {
+          let wmsLayer = new layer.Tile({
+            extent: bbox !== null ? bbox : this.map.getView().calculateExtent(),
+            opacity: 0.75,
+            source: new source.TileWMS({
+              attributions: [
+                new Attribution({
+                  html: '<div><img class="ol-attribution-large" ' +
+                  'src="' + this.state.ncWMSUrl + 'wms?REQUEST=GetLegendGraphic&COLORBARONLY=true&WIDTH=50&PALETTE=' + this.styles[this.layers.indexOf(selectedLayer)] + '&LAYERS=' + selectedLayer.Name + '"/>' +
+                  '<div class="vertical-text">' + selectedLayer.Abstract + '</div>' +
+                  '<div class="units"> Units: ' + layerMetadata.units + '</div>' +
+                  '<div class="units">Max: ' + layerMetadata.scaleRange[1] + '</div>' +
+                  '<div class="units">Min: ' + layerMetadata.scaleRange[0] + '</div>' +
+                  '</div>'
+                })
+              ],
+              projection: 'EPSG:3857',
+              url: this.state.ncWMSUrl + 'wms?SERVICE=wms',
+              crossOrigin: 'anonymous',
+              params: {
+                'LAYERS': selectedLayer.Name,
+                'TIME': moment(this.dateValue, 'DD/MM/YYYY HH:mm').toISOString(),
+                'STYLES': 'default-scalar/' + style
+              }
             })
-          ],
-          projection: 'EPSG:3857',
-          url: this.state.ncWMSUrl + 'wms?SERVICE=wms',
-          crossOrigin: 'anonymous',
-          params: {
-            'LAYERS': selectedLayer.Name,
-            'TIME': moment(this.dateValue, 'DD/MM/YYYY HH:mm').toISOString(),
-            'STYLES': 'default-scalar/' + style
-          }
+          });
+          wmsLayer.set('name', selectedLayer.Name);
+          this.map.addLayer(wmsLayer);
         })
-      });
-      wmsLayer.set('name', selectedLayer.Name);
-      this.map.addLayer(wmsLayer);
+        .catch(error => {
+          alert('error');
+          console.error(error);
+        });
     }
   }
 
@@ -405,7 +421,6 @@ export class Pydap extends BaseVM {
 
   @computedFrom('selectedDataset')
   get datasetSupportsRaw() {
-    console.log(this.selectDataset !== null && this.selectedDataset.Title.startsWith('http://'));
     return this.selectDataset !== null && this.selectedDataset.Title.startsWith('http://');
   }
 

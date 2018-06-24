@@ -216,7 +216,34 @@ div.au-stagger {
   max-height: 40em !important;
 }
 
-.ol-attribution > ul > li > a{
-  /*visibility: hidden;*/
+.ol-attribution > ul > li > a > img{
+  visibility: hidden;
 }
 
+.ol-attribution > ul > li > div {
+  margin-left: 5px;
+  margin-right: 5px;
+  text-align: center;
+  display: inline-block;
+}
+.ol-attribution > ul > li > div > img {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.ol-attribution > ul > li > div > div.vertical-text {
+  max-height: 20em !important;
+  font-size: 2em;
+  writing-mode: vertical-rl;
+  display: inline-block;
+  vertical-align:middle;
+  line-height: 1.2em;
+  margin-bottom: 10px;
+}
+
+.ol-attribution > ul > li > div >  div.units {
+  text-align: center;
+  font-size: 2em;
+  font-weight: bold;
+  line-height: 1.2em;
+}
