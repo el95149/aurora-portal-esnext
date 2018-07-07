@@ -161,7 +161,6 @@ export class Pydap extends BaseVM {
         let result = parser.read(text);
         // console.log(JSON.stringify(result, null, 2));
         this.datasets = result.Capability.Layer.Layer;
-        console.log(this.datasets);
         this.selectedDataset = this.datasets ? this.datasets[0] : null;
         this.layers = this.selectedDataset ? this.selectedDataset.Layer : undefined;
         //get time info
@@ -350,7 +349,6 @@ export class Pydap extends BaseVM {
 
       let bbox = null;
       if (this.source.getFeatures().length > 0) {
-        // console.log(this.source.getFeatures()[0].getGeometry().getExtent());
         bbox = this.source.getFeatures()[0].getGeometry().getExtent();
       }
 
@@ -453,6 +451,22 @@ export class Pydap extends BaseVM {
 
   downloadRaw() {
     window.open(this.selectedDataset.Title + '.ascii?');
+  }
+
+  downloadKMZ() {
+    let extent = null;
+    if (this.source.getFeatures().length > 0) {
+      extent = this.source.getFeatures()[0].getGeometry().getExtent();
+    } else {
+      extent = this.map.getView().calculateExtent(this.map.getSize());
+    }
+    let extentInWGS84 = proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326'); // perform projection transform with given extent
+    // bbox axis ordering is inverted, as per WMS basics: http://docs.geoserver.org/stable/en/user/services/wms/basics.html#axis-ordering
+    window.open(this.state.ncWMSUrl + 'wms?SERVICE=wms&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap' +
+      '&FORMAT=application%2Fvnd.google-earth.kmz&TRANSPARENT=true' +
+      '&LAYERS=' + this.selectedLayers[0].Name +
+      '&STYLES=default-scalar%2Fdefault&WIDTH=256&HEIGHT=256&CRS=EPSG%3A4326' +
+      '&BBOX=' + extentInWGS84[1] + ',' + extentInWGS84[0] + ',' + extentInWGS84[3] + ',' + extentInWGS84[2]);
   }
 
   clearBox() {
