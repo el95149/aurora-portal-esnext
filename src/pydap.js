@@ -8,7 +8,7 @@ import {HttpClient} from 'aurelia-fetch-client';
 import {ApplicationState} from './application-state';
 import {BaseVM} from './baseVM';
 import {TaskQueue} from 'aurelia-framework';
-import 'jquery';
+import $ from 'jquery';
 import moment from 'moment';
 import {saveAs} from 'file-saver';
 import {computedFrom} from 'aurelia-framework';
@@ -380,6 +380,7 @@ export class Pydap extends BaseVM {
                   '<div class="units"> Units: ' + layerMetadata.units + '</div>' +
                   '<div class="units">Max: ' + layerMetadata.scaleRange[1] + '</div>' +
                   '<div class="units">Min: ' + layerMetadata.scaleRange[0] + '</div>' +
+                  (this.elevation !== null ? '<div class="units elevationLegend">Elevation: ' + this.elevation  + '</div>' : '') +
                   '</div>'
                 })
               ],
@@ -473,5 +474,6 @@ export class Pydap extends BaseVM {
       let mapLayer = mapLayers[a];
       mapLayer.getSource().updateParams({'ELEVATION': this.elevation});
     }
+    $('.elevationLegend').text('Elevation: ' + this.elevation);
   }
 }
