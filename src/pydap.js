@@ -324,6 +324,8 @@ export class Pydap extends BaseVM {
   toggleLayer(selectedLayer) {
     let index = this.selectedLayers.indexOf(selectedLayer);
     if (index === -1) {
+      // layer has been de-selected (i.e. marked for removal from map)
+      // search in map layers and remove
       let layerToRemove = null;
       this.map.getLayers().forEach(mapLayer => {
         let layerName = mapLayer.get('name');
@@ -331,12 +333,14 @@ export class Pydap extends BaseVM {
           layerToRemove = mapLayer;
         }
       });
-
       if (layerToRemove) {
         this.map.removeLayer(layerToRemove);
       }
+      // allow only one selected layer at a time
+      this.selectedLayers = [];
     } else {
-      console.log('show layer');
+      // layer has been selected (i.e. marked for display)
+      this.selectedLayers = [selectedLayer];
       // let style = this.styles[Math.floor(Math.random() * this.styles.length)];
       //choose a pallete style, based on the selected layer index
       let style = this.styles[this.layers.indexOf(selectedLayer)];
@@ -391,10 +395,13 @@ export class Pydap extends BaseVM {
             })
           });
           wmsLayer.set('name', selectedLayer.Name);
+          // only allow one selected layer at a time
+          this.map.getLayers().clear();
+          this.map.addLayer(this.baseLayer);
+          this.map.addLayer(this.vectorLayer);
           this.map.addLayer(wmsLayer);
         })
         .catch(error => {
-          alert('error');
           console.error(error);
         });
     }
