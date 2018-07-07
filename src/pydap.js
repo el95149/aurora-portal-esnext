@@ -116,30 +116,32 @@ export class Pydap extends BaseVM {
     'x-Rainbow',
     'x-Rainbow-inv',
     'x-Sst',
-    'x-Sst-inv']
-  actionButtons = ['close', 'collapsible', 'maximize', 'minimize', 'pin']
-  dialogPosition = {X: 100, Y: 10}
-  dateValue
-  minDate
-  maxDate
-  interval
-  map = null
-  fields
-  filterType
-  dataManager
-  query
-  vectorLayer = null
-  popupElement = null
-  popupOverlay = null
-  startLonLat = Messages.COORDINATES_EUROPE_CENTER
-  baseLayer
-  datasets = []
-  selectedDataset = null
-  layers = []
-  selectedLayers = []
-  menuDisplayed = true
-  source = null
-  boundingBoxPresent = false
+    'x-Sst-inv'];
+  actionButtons = ['close', 'collapsible', 'maximize', 'minimize', 'pin'];
+  dialogPosition = {X: 100, Y: 10};
+  dateValue;
+  minDate;
+  maxDate;
+  interval;
+  map = null;
+  fields;
+  filterType;
+  dataManager;
+  query;
+  vectorLayer = null;
+  popupElement = null;
+  popupOverlay = null;
+  startLonLat = Messages.COORDINATES_EUROPE_CENTER;
+  baseLayer;
+  datasets = [];
+  selectedDataset = null;
+  layers = [];
+  selectedLayers = [];
+  menuDisplayed = true;
+  source = null;
+  boundingBoxPresent = false;
+  elevations = [];
+  elevation = null;
 
   constructor(http, state, taskQueue) {
     super();
@@ -307,13 +309,15 @@ export class Pydap extends BaseVM {
 
   selectDataset() {
     this.layers = this.selectedDataset.Layer;
+    // clear any previously selected layers and/or drawn boxes
+    this.selectedLayers = [];
     this.map.getLayers().clear();
     this.map.addLayer(this.baseLayer);
     this.map.addLayer(this.vectorLayer);
-    // clear any previously selected layers and/or drawn boxes
-    this.selectedLayers = [];
     this.source.clear();
     this.boundingBoxPresent = false;
+    this.elevations = [];
+    this.elevation = null;
     this.updateTimeInfo();
   }
 
@@ -350,10 +354,20 @@ export class Pydap extends BaseVM {
         '&LAYERNAME=' + selectedLayer.Name)
         .then(response => response.json())
         .then(layerMetadata => {
+          // extract elevation meta-data (if applicable)
+          if (layerMetadata.zaxis) {
+            this.elevations = layerMetadata.zaxis.values;
+            this.elevation = this.elevations[0];
+          } else {
+            this.elevations = [];
+            this.elevation = null;
+          }
+          // create WMS layer
           let wmsLayer = new layer.Tile({
             extent: bbox !== null ? bbox : this.map.getView().calculateExtent(),
             opacity: 0.75,
             source: new source.TileWMS({
+              // construct custom map legend
               attributions: [
                 new Attribution({
                   html: '<div><img class="ol-attribution-large" ' +
@@ -371,7 +385,8 @@ export class Pydap extends BaseVM {
               params: {
                 'LAYERS': selectedLayer.Name,
                 'TIME': moment(this.dateValue, 'DD/MM/YYYY HH:mm').toISOString(),
-                'STYLES': 'default-scalar/' + style
+                'STYLES': 'default-scalar/' + style,
+                'ELEVATION': this.elevation !== null ? this.elevation : ''
               }
             })
           });
@@ -412,8 +427,7 @@ export class Pydap extends BaseVM {
     let moment2 = moment(this.dateValue, 'DD/MM/YYYY HH:mm');
     console.log('New Date Value:' + moment2.toISOString());
     let mapLayers = this.map.getLayers().getArray();
-    console.log(mapLayers.length);
-    for (let a = 1; a < mapLayers.length; a++) {
+    for (let a = 2; a < mapLayers.length; a++) {
       let mapLayer = mapLayers[a];
       mapLayer.getSource().updateParams({'TIME': moment2.toISOString()});
     }
@@ -440,7 +454,17 @@ export class Pydap extends BaseVM {
     this.map.addLayer(this.vectorLayer);
     this.source.clear();
     this.boundingBoxPresent = false;
+    this.elevations = [];
+    this.elevation = null;
     this.map.getView().setCenter(proj.fromLonLat(this.startLonLat, 'EPSG:3857'));
     this.map.getView().setZoom(Pydap.ZOOM_LEVEL_DEFAULT);
+  }
+
+  selectElevation() {
+    let mapLayers = this.map.getLayers().getArray();
+    for (let a = 2; a < mapLayers.length; a++) {
+      let mapLayer = mapLayers[a];
+      mapLayer.getSource().updateParams({'ELEVATION': this.elevation});
+    }
   }
 }

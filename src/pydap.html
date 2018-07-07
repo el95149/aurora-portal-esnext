@@ -33,7 +33,13 @@
                        ej-date-time-picker="e-value.bind:dateValue;e-min-date-time.bind:minDate;e-max-date-time.bind:maxDate;e-interval.bind:interval;e-width.bind:'100%';e-date-time-format.bind:'dd/MM/yyyy HH:mm';e-time-display-format.bind:'HH:mm'"
                        e-on-change.trigger="changeTime($event)" e-on-close.trigger="onClose($event)"/>
               </div>
-
+              <div class="form-group">
+                <label for="elevation">Elevation</label>
+                <select value.bind="elevation" id="elevation" class="form-control"
+                        change.delegate="selectElevation()" disabled.bind="!elevation">
+                  <option repeat.for="elevation of elevations" model.bind="elevation">${elevation}</option>
+                </select>
+              </div>
               <div class="alert alert-info" role="alert" if.bind="!isSelectionPresent">
                 <i class="fa fa-info-circle"></i>
                 To select an area: Left click on the start and end of the desired bounding box.
