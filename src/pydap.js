@@ -190,8 +190,8 @@ export class Pydap extends BaseVM {
     // initialize map
     this.baseLayer = new layer.Tile({
       // opacity: 0.5,
-      source: new source.XYZ({
-        url: 'https://{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
+      source: new source.TileJSON({
+        url: 'https://api.tiles.mapbox.com/v3/mapbox.world-light.json?secure',
         wrapX: false,
         crossOrigin: 'anonymous'
       })
