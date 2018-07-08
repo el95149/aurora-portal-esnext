@@ -12,11 +12,10 @@ import $ from 'jquery';
 import moment from 'moment';
 import {saveAs} from 'file-saver';
 import {computedFrom} from 'aurelia-framework';
+import {DialogService} from 'aurelia-dialog';
+import {Chart} from './chart';
 
-// import Control = ol.control.Control;
-
-
-@inject(HttpClient, ApplicationState, TaskQueue)
+@inject(HttpClient, ApplicationState, TaskQueue, DialogService)
 export class Pydap extends BaseVM {
 
   static get ZOOM_LEVEL_DEFAULT() {
@@ -143,11 +142,12 @@ export class Pydap extends BaseVM {
   elevations = [];
   elevation = null;
 
-  constructor(http, state, taskQueue) {
+  constructor(http, state, taskQueue, dialogService) {
     super();
     this.http = http;
     this.state = state;
     this.taskQueue = taskQueue;
+    this.dialogService = dialogService;
 
     http.configure(config => {
       config
@@ -227,18 +227,8 @@ export class Pydap extends BaseVM {
       this.map.renderSync();
     }, false);
 
-    // let dragBox = new interaction.DragBox({
-    //   condition: events.condition.platformModifierKeyOnly
-    // });
+    // add bounding box selection
     let _self = this;
-    // dragBox.on('boxend', function() {
-    //   // Your stuff when the box is already drawn
-    //   let extent = dragBox.getGeometry().getExtent();
-    //   console.log(extent);
-    //   _self.map.getView().fit(dragBox.getGeometry(), _self.map.getSize());
-    // });
-    // this.map.addInteraction(dragBox);
-
     let draw = new interaction.Draw({
       source: this.source,
       type: 'Circle',
@@ -256,12 +246,17 @@ export class Pydap extends BaseVM {
             mapLayer.setExtent(e.feature.getGeometry().getExtent());
           }
         });
-        // selectedLayer.setExtent(e.feature.getGeometry().getExtent());
       });
       _self.map.getView().fit(e.feature.getGeometry(), _self.map.getSize());
     });
-
     this.map.addInteraction(draw);
+    // this.map.events.register('click', map, handleMapClick);
+    this.map.on('click', function(evt) {
+      if (_self.elevation !== null && evt.originalEvent.ctrlKey) {
+        console.log(proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326'));
+        _self.plotChart(evt.pixel);
+      }
+    });
 
     $('#btnOpen').hide();
   }
@@ -337,6 +332,8 @@ export class Pydap extends BaseVM {
       }
       // allow only one selected layer at a time
       this.selectedLayers = [];
+      this.elevation = null;
+      this.elevations = [];
     } else {
       // layer has been selected (i.e. marked for display)
       this.selectedLayers = [selectedLayer];
@@ -378,7 +375,7 @@ export class Pydap extends BaseVM {
                   '<div class="units"> Units: ' + layerMetadata.units + '</div>' +
                   '<div class="units">Max: ' + layerMetadata.scaleRange[1] + '</div>' +
                   '<div class="units">Min: ' + layerMetadata.scaleRange[0] + '</div>' +
-                  (this.elevation !== null ? '<div class="units elevationLegend">Elevation: ' + this.elevation  + '</div>' : '') +
+                  (this.elevation !== null ? '<div class="units elevationLegend">Elevation: ' + this.elevation + '</div>' : '') +
                   '</div>'
                 })
               ],
@@ -489,5 +486,29 @@ export class Pydap extends BaseVM {
       mapLayer.getSource().updateParams({'ELEVATION': this.elevation});
     }
     $('.elevationLegend').text('Elevation: ' + this.elevation);
+  }
+
+  getVerticalProfile() {
+    // http://localhost:8080/ncWMS2/wms?REQUEST=GetVerticalProfile&LAYERS=AURORA_BIRA/forecast_subtp_ozone_profile&QUERY_LAYERS=AURORA_BIRA/forecast_subtp_ozone_profile&BBOX=-180,-144,180,144&SRS=CRS:84&FEATURE_COUNT=5&HEIGHT=600&WIDTH=750&X=479&Y=249&STYLES=default/default&TIME=2012-06-29T00%3A00%3A00.000Z&VERSION=1.1.1&INFO_FORMAT=image/png
+  }
+
+  plotChart(pixel) {
+    let extent = this.map.getView().calculateExtent(this.map.getSize());
+    let extentInWGS84 = proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
+    console.log(extentInWGS84);
+    let moment2 = moment(this.dateValue, 'DD/MM/YYYY HH:mm');
+    console.log('New Date Value:' + moment2.toISOString());
+    let chart = {
+      extent: extentInWGS84,
+      layer: this.selectedLayers[0].Name,
+      pixel: pixel,
+      mapSize: this.map.getSize(),
+      time: moment2.toISOString()
+    };
+    this.dialogService.open({viewModel: Chart, model: chart, lock: false}).whenClosed(response => {
+      if (!response.wasCancelled) {
+        console.log('good - ', response.output);
+      }
+    });
   }
 }

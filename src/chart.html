@@ -1,0 +1,12 @@
+<template>
+  <ux-dialog>
+    <ux-dialog-header>Vertical profile Chart</ux-dialog-header>
+    <ux-dialog-body>
+      <img src.bind="chart" if.bind="chart != null"/>
+    </ux-dialog-body>
+    <ux-dialog-footer>
+      <button type="button" class="btn btn-success" click.delegate="download()">Download</button>
+      <button type="button" class="btn btn-default" click.delegate="controller.cancel()">Cancel</button>
+    </ux-dialog-footer>
+  </ux-dialog>
+</template>

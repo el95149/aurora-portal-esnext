@@ -4,102 +4,115 @@
   <require from="./errors.html"></require>
   <section id="wrapper">
 
-    <div id="map">
 
-      <a href="#menu-toggle" class="btn btn-default filters" id="menu-toggle" click.delegate="toggleMenu()"
-         show.bind="!menuDisplayed">&#9776;&nbsp;Filters</a>
+    <a href="#menu-toggle" class="btn btn-default filters" id="menu-toggle" click.delegate="toggleMenu()"
+       show.bind="!menuDisplayed">&#9776;&nbsp;Filters</a>
 
-      <div id="popup"></div>
+    <div id="sidebar-wrapper">
+      <h3>Filters</h3>
+      <ul class="sidebar-nav">
+        <li class="sidebar-brand">
+          <a href="javascript:void(0)" class="closebtn" click.delegate="toggleMenu()">&times; Hide</a>
+        </li>
+        <li>
+          <form role="form" style="margin-bottom: 100px">
 
-      <div id="sidebar-wrapper">
-        <h3>Filters</h3>
-        <ul class="sidebar-nav">
-          <li class="sidebar-brand">
-            <a href="javascript:void(0)" class="closebtn" click.delegate="toggleMenu()">&times; Hide</a>
-          </li>
-          <li>
-            <form role="form" style="margin-bottom: 100px">
+            <div class="form-group">
+              <label for="dataset">Data-set</label>
+              <select value.bind="selectedDataset" id="dataset" class="form-control"
+                      change.delegate="selectDataset()">
+                <option repeat.for="set of datasets" model.bind="set">${set.Title}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="datepick">Date/Time</label>
+              <input id="datepick"
+                     ej-date-time-picker="e-value.bind:dateValue;e-min-date-time.bind:minDate;e-max-date-time.bind:maxDate;e-interval.bind:interval;e-width.bind:'100%';e-date-time-format.bind:'dd/MM/yyyy HH:mm';e-time-display-format.bind:'HH:mm'"
+                     e-on-change.trigger="changeTime($event)" e-on-close.trigger="onClose($event)"/>
+            </div>
+            <div class="form-group">
+              <label for="elevation">Elevation</label>
+              <select value.bind="elevation" id="elevation" class="form-control"
+                      change.delegate="selectElevation()" disabled.bind="!elevation">
+                <option repeat.for="elevation of elevations" model.bind="elevation">${elevation}</option>
+              </select>
+            </div>
 
-              <div class="form-group">
-                <label for="dataset">Data-set</label>
-                <select value.bind="selectedDataset" id="dataset" class="form-control"
-                        change.delegate="selectDataset()">
-                  <option repeat.for="set of datasets" model.bind="set">${set.Title}</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="datepick">Date/Time</label>
-                <input id="datepick"
-                       ej-date-time-picker="e-value.bind:dateValue;e-min-date-time.bind:minDate;e-max-date-time.bind:maxDate;e-interval.bind:interval;e-width.bind:'100%';e-date-time-format.bind:'dd/MM/yyyy HH:mm';e-time-display-format.bind:'HH:mm'"
-                       e-on-change.trigger="changeTime($event)" e-on-close.trigger="onClose($event)"/>
-              </div>
-              <div class="form-group">
-                <label for="elevation">Elevation</label>
-                <select value.bind="elevation" id="elevation" class="form-control"
-                        change.delegate="selectElevation()" disabled.bind="!elevation">
-                  <option repeat.for="elevation of elevations" model.bind="elevation">${elevation}</option>
-                </select>
-              </div>
-              <div class="alert alert-info" role="alert" if.bind="!isSelectionPresent">
-                <i class="fa fa-info-circle"></i>
-                To select an area: Left click on the start and end of the desired bounding box.
-              </div>
+            <div class="alert alert-success" role="alert" if.bind="elevation !=  null">
+              <i class="fa fa-info-circle"></i>
+              To display a vertical profile chart, press <strong>Ctrl + Left mouse click</strong> on any point on the
+              map.
+            </div>
 
-              <div class="alert alert-success" role="alert" if.bind="isSelectionPresent && selectedLayers.length == 0">
-                <i class="fa fa-info-circle"></i>
-                Now select one more more layers, to actually display data!
-              </div>
+            <div class="alert alert-info" role="alert" if.bind="!isSelectionPresent">
+              <i class="fa fa-info-circle"></i>
+              To select an area: Left click on the start and end of the desired bounding box.
+            </div>
 
-              <div class="alert alert-warning" role="alert" if.bind="isSelectionPresent && selectedLayers.length > 0">
-                <i class="fa fa-info-circle"></i>
-                To clear selected area,, click on the 'Clear Box-Layers' button below the available layers!
-              </div>
+            <div class="alert alert-success" role="alert" if.bind="isSelectionPresent && selectedLayers.length == 0">
+              <i class="fa fa-info-circle"></i>
+              Now select one more more layers, to actually display data!
+            </div>
 
-              <div class="form-group">
-                <label>Layers</label>
-                <div repeat.for="layer of layers" class="checkbox" style="margin-bottom:20px">
-                  <label style="margin-bottom: 5px">
-                    <input type="checkbox" model.bind="layer"
-                           checked.bind="$parent.selectedLayers" change.delegate="toggleLayer(layer)">${layer.Abstract}
-                    (${layer.Name})
-                  </label>
+            <div class="alert alert-warning" role="alert" if.bind="isSelectionPresent && selectedLayers.length > 0">
+              <i class="fa fa-info-circle"></i>
+              To clear selected area,, click on the 'Clear Box-Layers' button below the available layers!
+            </div>
 
-                </div>
+            <div class="form-group">
+              <label>Layers</label>
+              <div repeat.for="layer of layers" class="checkbox" style="margin-bottom:20px">
+                <label style="margin-bottom: 5px">
+                  <input type="checkbox" model.bind="layer"
+                         checked.bind="$parent.selectedLayers" change.delegate="toggleLayer(layer)">${layer.Abstract}
+                  (${layer.Name})
+                </label>
+
               </div>
-              <div class="form-group">
-                <div class="btn-group">
-                  <button id="clearBox" class="btn btn-danger" click.delegate="clearBox()" disabled.bind="!isSelectionPresent"><i
-                    class="fa fa-remove" aria-hidden="true"></i>&nbsp;Clear Box-Layers</button>
-                </div>
+            </div>
+            <div class="form-group">
+              <div class="btn-group">
+                <button id="clearBox" class="btn btn-danger" click.delegate="clearBox()"
+                        disabled.bind="!isSelectionPresent"><i
+                  class="fa fa-remove" aria-hidden="true"></i>&nbsp;Clear Box-Layers
+                </button>
               </div>
-              <div class="form-group">
-                <div class="btn-group">
-                  <button id="btnOpen" type="button" class="btn btn-success"
-                          click.delegate="showDialog()">Show Map
-                  </button>
-                  <a id="export-png" class="btn btn-success" target="_blank"><i
-                    class="fa fa-download" aria-hidden="true"></i>&nbsp;Download Map</a>
-                </div>
+            </div>
+            <div class="form-group">
+              <div class="btn-group">
+                <button id="btnOpen" type="button" class="btn btn-success"
+                        click.delegate="showDialog()">Show Map
+                </button>
+                <a id="export-png" class="btn btn-success" target="_blank"><i
+                  class="fa fa-download" aria-hidden="true"></i>&nbsp;Download Map</a>
               </div>
-              <div class="form-group">
-                <div class="btn-group">
-                  <button id="btnKMZ" class="btn btn-success" click.delegate="downloadKMZ()" disabled.bind="!isSelectionPresent"><i
-                    class="fa fa-download" aria-hidden="true"></i>&nbsp;Download Map as KMZ</button>
-                </div>
+            </div>
+            <div class="form-group">
+              <div class="btn-group">
+                <button id="btnKMZ" class="btn btn-success" click.delegate="downloadKMZ()"
+                        disabled.bind="!isSelectionPresent"><i
+                  class="fa fa-download" aria-hidden="true"></i>&nbsp;Download Map as KMZ
+                </button>
               </div>
-              <div class="form-group">
-                <div class="btn-group">
-                  <button id="btnRaw" class="btn btn-primary" click.delegate="downloadRaw()" disabled.bind="!datasetSupportsRaw"><i
-                    class="fa fa-download" aria-hidden="true"></i>&nbsp;Download Raw Data</button>
-                </div>
+            </div>
+            <div class="form-group">
+              <div class="btn-group">
+                <button id="btnRaw" class="btn btn-primary" click.delegate="downloadRaw()"
+                        disabled.bind="!datasetSupportsRaw"><i
+                  class="fa fa-download" aria-hidden="true"></i>&nbsp;Download Raw Data
+                </button>
               </div>
-              <div class="alert alert-warning" role="alert" if.bind="!datasetSupportsRaw">
-                RAW data not supported for Data-set
-              </div>
-            </form>
-          </li>
-        </ul>
-      </div>
+            </div>
+            <div class="alert alert-warning" role="alert" if.bind="!datasetSupportsRaw">
+              RAW data not supported for Data-set
+            </div>
+          </form>
+        </li>
+      </ul>
     </div>
+
+    <div id="map">
+    </div>
+
   </section>
 </template>

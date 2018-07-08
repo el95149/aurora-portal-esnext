@@ -169,4 +169,8 @@ body {
     position: relative;
     margin-right: 0;
   }
+
+  ux-dialog-container > div {
+    margin-top: 150px !important;
+  }
 }
