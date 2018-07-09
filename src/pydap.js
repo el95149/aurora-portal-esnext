@@ -118,9 +118,9 @@ export class Pydap extends BaseVM {
     'x-Sst-inv'];
   actionButtons = ['close', 'collapsible', 'maximize', 'minimize', 'pin'];
   dialogPosition = {X: 100, Y: 10};
-  dateValue;
-  minDate;
-  maxDate;
+  dateValue = null;
+  minDate = null;
+  maxDate = null;
   interval;
   map = null;
   fields;
@@ -164,9 +164,9 @@ export class Pydap extends BaseVM {
         this.selectedDataset = this.datasets ? this.datasets[0] : null;
         this.layers = this.selectedDataset ? this.selectedDataset.Layer : undefined;
         //get time info
-        if (this.layers) {
-          this.updateTimeInfo();
-        }
+        // if (this.layers) {
+        //   this.updateTimeInfo();
+        // }
         // $("#datepick").ejDateTimePicker({value: this.dateValue});
       })
       .catch(error => {
@@ -290,7 +290,14 @@ export class Pydap extends BaseVM {
   }
 
   updateTimeInfo() {
-    let timeDimension = this.layers[0].Dimension[0];
+    if (!this.selectedLayers[0].Dimension) {
+      this.minDate = null;
+      this.maxDate = null;
+      this.dateValue = null;
+      return;
+    }
+    let timeDimension = this.selectedLayers[0].Dimension[0];
+    console.log(timeDimension);
     let values = timeDimension.values;
     let minDateAsString = values.substring(0, values.indexOf('/'));
     let maxDateAsString = values.substring(values.indexOf('/') + 1, values.lastIndexOf('/'));
@@ -308,7 +315,7 @@ export class Pydap extends BaseVM {
     console.log('Max Date:' + this.maxDate);
     let defaultDate = new Date(timeDimension.default);
     console.log('Default Date:' + defaultDate.toISOString());
-    this.dateValue = moment(defaultDate).format('DD/MM/YYYY HH:mm');
+    this.dateValue = moment.utc(defaultDate).format('DD/MM/YYYY HH:mm').toString();
     console.log('Date Value:' + this.dateValue);
   }
 
@@ -323,7 +330,9 @@ export class Pydap extends BaseVM {
     this.boundingBoxPresent = false;
     this.elevations = [];
     this.elevation = null;
-    this.updateTimeInfo();
+    this.minDate = null;
+    this.maxDate = null;
+    this.dateValue = null;
   }
 
   toggleLayer(selectedLayer) {
@@ -345,9 +354,13 @@ export class Pydap extends BaseVM {
       this.selectedLayers = [];
       this.elevation = null;
       this.elevations = [];
+      this.minDate = null;
+      this.maxDate = null;
+      this.dateValue = null;
     } else {
       // layer has been selected (i.e. marked for display)
       this.selectedLayers = [selectedLayer];
+      this.updateTimeInfo();
       // let style = this.styles[Math.floor(Math.random() * this.styles.length)];
       //choose a pallete style, based on the selected layer index
       let style = this.styles[this.layers.indexOf(selectedLayer)];
@@ -486,6 +499,9 @@ export class Pydap extends BaseVM {
     this.boundingBoxPresent = false;
     this.elevations = [];
     this.elevation = null;
+    this.minDate = null
+    this.maxDate = null;
+    this.dateValue = null;
     this.map.getView().setCenter(proj.fromLonLat(this.startLonLat, 'EPSG:3857'));
     this.map.getView().setZoom(Pydap.ZOOM_LEVEL_DEFAULT);
   }
@@ -508,13 +524,16 @@ export class Pydap extends BaseVM {
     let extentInWGS84 = proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
     console.log(extentInWGS84);
     let moment2 = moment(this.dateValue, 'DD/MM/YYYY HH:mm');
+    console.log(moment2);
     let chart = {
       extent: extentInWGS84,
       layer: this.selectedLayers[0].Name,
       pixel: pixel,
       mapSize: this.map.getSize(),
-      time: moment2.toISOString()
+      time: (moment2.format('YYYY-MM-DDTHH:mm:ss.000') + 'Z')
     };
+    //2012-06-29T00:00:00.000Z
+
     this.dialogService.open({viewModel: Chart, model: chart, lock: false}).whenClosed(response => {
       if (!response.wasCancelled) {
         console.log('good - ', response.output);
