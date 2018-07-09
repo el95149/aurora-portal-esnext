@@ -217,8 +217,9 @@ export class Pydap extends BaseVM {
       ],
       //overlays: [this.popupOverlay],
       view: new View({
+        extent: proj.transformExtent([-180, -90, 180, 90], 'EPSG:4326', 'EPSG:3857'),
         center: proj.fromLonLat(this.startLonLat, 'EPSG:3857'),
-        zoom: 1
+        zoom: Pydap.ZOOM_LEVEL_DEFAULT
       })
     });
     this.map.addControl(new control.Attribution({collapsed: false}));
