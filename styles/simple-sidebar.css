@@ -138,8 +138,9 @@ body {
 
 @media (min-width: 768px) {
 
-  #map{
-    margin-top: -80px;
+  #mouse-position{
+    /*margin-top: 10px;*/
+    /*margin-left: 360px;*/
   }
 
   #wrapper {
@@ -153,7 +154,7 @@ body {
 
   #sidebar-wrapper {
     width: 350px;
-    margin-top: 80px;
+    /*margin-top: 80px;*/
   }
 
   #wrapper.toggled #sidebar-wrapper {

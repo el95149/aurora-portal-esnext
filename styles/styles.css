@@ -208,6 +208,14 @@ div.au-stagger {
 }
 */
 
+#map{
+  margin-left: 350px;
+  /*margin-top: -80px;*/
+  width: 750px;
+  height: 600px;
+}
+
+
 .spacer {
   margin-bottom: 20px; /* define margin as you see fit */
 }

@@ -1,7 +1,7 @@
 /**
  * Created by aanagnostopoulos on 11/7/2017.
  */
-import {layer, Map, Overlay, source, View, proj, format, Attribution, control, interaction} from 'openlayers';
+import {layer, Map, Overlay, source, View, proj, format, Attribution, control, interaction, coordinate} from 'openlayers';
 import {inject} from 'aurelia-dependency-injection';
 import {Messages} from './messages';
 import {HttpClient} from 'aurelia-fetch-client';
@@ -188,6 +188,16 @@ export class Pydap extends BaseVM {
     });
 
 
+    const mousePositionControl = new control.MousePosition({
+      coordinateFormat: coordinate.createStringXY(4),
+      projection: 'EPSG:4326',
+      // comment the following two lines to have the mouse position
+      // be placed within the map.
+      className: 'custom-mouse-position',
+      target: document.getElementById('mouse-position'),
+      undefinedHTML: 'Ν/Α'
+    });
+
     // initialize map
     this.baseLayer = new layer.Tile({
       // opacity: 0.5,
@@ -208,12 +218,12 @@ export class Pydap extends BaseVM {
       //overlays: [this.popupOverlay],
       view: new View({
         center: proj.fromLonLat(this.startLonLat, 'EPSG:3857'),
-        zoom: Pydap.ZOOM_LEVEL_DEFAULT
+        zoom: 1
       })
     });
     this.map.addControl(new control.Attribution({collapsed: false}));
+    this.map.addControl(mousePositionControl);
     let exportPNGElement = document.getElementById('export-png');
-    // exportPNGElement.href = 'javascript:void(0)';
 
     exportPNGElement.addEventListener('click', e => {
       this.map.once('postcompose', event => {
@@ -234,12 +244,12 @@ export class Pydap extends BaseVM {
       type: 'Circle',
       geometryFunction: interaction.Draw.createBox()
     });
-    draw.on('drawend', function (e) {
+    draw.on('drawend', function(e) {
       // Your stuff when the box is already drawn
       // clear any previously drawn boxes
       _self.boundingBoxPresent = true;
       _self.source.clear();
-      _self.selectedLayers.forEach(function (selectedLayer) {
+      _self.selectedLayers.forEach(function(selectedLayer) {
         _self.map.getLayers().forEach(mapLayer => {
           let layerName = mapLayer.get('name');
           if (selectedLayer.Name === layerName) {
@@ -252,6 +262,7 @@ export class Pydap extends BaseVM {
     this.map.addInteraction(draw);
     // this.map.events.register('click', map, handleMapClick);
     this.map.on('click', function(evt) {
+      console.log(evt.pixel);
       if (_self.elevation !== null && evt.originalEvent.ctrlKey) {
         console.log(proj.transform(evt.coordinate, 'EPSG:3857', 'EPSG:4326'));
         _self.plotChart(evt.pixel);
@@ -265,7 +276,7 @@ export class Pydap extends BaseVM {
     console.log('click');
     let exportPNGElement = document.getElementById('export-png');
     // var canvas:any = document.getElementsByTagName('canvas')[0];
-    this.map.once('postcompose', function (event) {
+    this.map.once('postcompose', function(event) {
       let canvas = event.context.canvas;
       exportPNGElement.href = canvas.toDataURL('image/png');
       // console.log(canvas.toDataURL('image/png'));
@@ -463,7 +474,7 @@ export class Pydap extends BaseVM {
       '&FORMAT=application%2Fvnd.google-earth.kmz&TRANSPARENT=true' +
       '&LAYERS=' + this.selectedLayers[0].Name +
       '&STYLES=default-scalar%2Fdefault&WIDTH=256&HEIGHT=256&CRS=EPSG%3A4326' +
-      '&BBOX=' + extentInWGS84[1] + ',' + extentInWGS84[0] + ',' + extentInWGS84[3] + ',' + extentInWGS84[2]);
+      '&BBOX=' + extentInWGS84[0] + ',' + extentInWGS84[1] + ',' + extentInWGS84[2] + ',' + extentInWGS84[3]);
   }
 
   clearBox() {
@@ -497,7 +508,6 @@ export class Pydap extends BaseVM {
     let extentInWGS84 = proj.transformExtent(extent, 'EPSG:3857', 'EPSG:4326');
     console.log(extentInWGS84);
     let moment2 = moment(this.dateValue, 'DD/MM/YYYY HH:mm');
-    console.log('New Date Value:' + moment2.toISOString());
     let chart = {
       extent: extentInWGS84,
       layer: this.selectedLayers[0].Name,
