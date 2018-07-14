@@ -209,7 +209,6 @@ export class Pydap extends BaseVM {
     });
 
     this.map = new Map({
-      controls: [],
       target: 'map',
       layers: [
         this.baseLayer,
