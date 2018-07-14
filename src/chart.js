@@ -38,26 +38,26 @@ export class Chart extends BaseVM {
       '&TIME=' + chart.time +
       '&VERSION=1.1.1&INFO_FORMAT=image/png';
 
-    window.open(this.state.ncWMSUrl + 'wms?' +
-      '&LAYERS=' + chart.layer +
-      '&QUERY_LAYERS=' + chart.layer +
-      '&STYLES=default-scalar%2Fdefault' +
-      '&SERVICE=WMS' +
-      '&VERSION=1.1.1' +
-      '&REQUEST=GetFeatureInfo' +
-      '&BBOX=' + chart.extent[0] + ',' + chart.extent[1] + ',' + chart.extent[2] + ',' + chart.extent[3] +
-      '&FEATURE_COUNT=5' +
-      '&HEIGHT=' + chart.mapSize[1] +
-      '&WIDTH=' + chart.mapSize[0] +
-      '&X=' + Math.trunc(chart.pixel[0]) +
-      '&Y=' + Math.trunc(chart.pixel[1]) +
-      // '&X=' + Math.round(chart.pixel[0]) +
-      // '&Y=' + Math.round(chart.pixel[1]) +
-      '&FORMAT=image%2Fpng' +
-      '&INFO_FORMAT=text%2Fxml' +
-      '&SRS=CRS:84' +
-      '&TIME=' + chart.time +
-      '&ELEVATION=1');
+    // window.open(this.state.ncWMSUrl + 'wms?' +
+    //   '&LAYERS=' + chart.layer +
+    //   '&QUERY_LAYERS=' + chart.layer +
+    //   '&STYLES=default-scalar%2Fdefault' +
+    //   '&SERVICE=WMS' +
+    //   '&VERSION=1.1.1' +
+    //   '&REQUEST=GetFeatureInfo' +
+    //   '&BBOX=' + chart.extent[0] + ',' + chart.extent[1] + ',' + chart.extent[2] + ',' + chart.extent[3] +
+    //   '&FEATURE_COUNT=5' +
+    //   '&HEIGHT=' + chart.mapSize[1] +
+    //   '&WIDTH=' + chart.mapSize[0] +
+    //   '&X=' + Math.trunc(chart.pixel[0]) +
+    //   '&Y=' + Math.trunc(chart.pixel[1]) +
+    //   // '&X=' + Math.round(chart.pixel[0]) +
+    //   // '&Y=' + Math.round(chart.pixel[1]) +
+    //   '&FORMAT=image%2Fpng' +
+    //   '&INFO_FORMAT=text%2Fxml' +
+    //   '&SRS=CRS:84' +
+    //   '&TIME=' + chart.time +
+    //   '&ELEVATION=1');
   }
 
   download() {
