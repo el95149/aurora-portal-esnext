@@ -210,7 +210,7 @@ div.au-stagger {
 
 #map{
   margin-left: 350px;
-  width: 100%;
+  width: 1024px;
   height: 600px;
   padding: 0px !important;
 }
@@ -234,6 +234,7 @@ div.au-stagger {
   text-align: center;
   display: inline-block;
 }
+
 .ol-attribution > ul > li > div > img {
   padding-top: 10px;
   padding-bottom: 10px;
