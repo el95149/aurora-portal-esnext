@@ -487,7 +487,7 @@ export class Pydap extends BaseVM {
       '&FORMAT=application%2Fvnd.google-earth.kmz&TRANSPARENT=true' +
       '&LAYERS=' + this.selectedLayers[0].Name +
       '&STYLES=default-scalar%2Fdefault&WIDTH=256&HEIGHT=256&CRS=EPSG%3A4326' +
-      '&BBOX=' + extentInWGS84[0] + ',' + extentInWGS84[1] + ',' + extentInWGS84[2] + ',' + extentInWGS84[3]);
+      '&BBOX=' + extentInWGS84[1] + ',' + extentInWGS84[0] + ',' + extentInWGS84[3] + ',' + extentInWGS84[2]);
   }
 
   clearBox() {
