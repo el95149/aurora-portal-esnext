@@ -1,4 +1,10 @@
-# aurelia-skeleton-navigation
+# Aurora Portal
+
+A JS based web portal, used to display satellite WMS data.
+
+H2020 project home: http://www.aurora-copernicus.eu/
+
+
 
 ## Running The App
 
